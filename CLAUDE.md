@@ -33,7 +33,7 @@ Desktop-only testing hides the iOS Safari toolbar and safe-area bugs this app is
 
 ## Stack
 
-- **Next.js 15** (App Router) — **JavaScript, not TypeScript**; `jsconfig.json`
+- **Next.js 16** (App Router, Turbopack) — **TypeScript**, `strict: true`; `tsconfig.json`
 - **Tailwind CSS v4** via `@tailwindcss/postcss`
 - **Prisma 7** + `@prisma/adapter-pg` → Supabase Postgres
 - **Supabase Storage** for illustrations
@@ -49,16 +49,16 @@ access together in one folder. `/app` is routing only.
 
 ```
 /app                          # ROUTING ONLY — thin pages that import from /features
-  /(reader)/story/[id]/page.jsx
-  /author/page.jsx
-  /author/story/[id]/page.jsx
+  /(reader)/story/[id]/page.tsx
+  /author/page.tsx
+  /author/story/[id]/page.tsx
   /api/...                    # route handlers: validate → delegate to a feature service → respond
 /features
   /reader                     # the scrollytelling engine
     /components               # StoryReader, ImageStage, BeatSection, ChapterCard
     /hooks                    # useActiveBeat, useImagePreload, useWakeLock, useFontSize
     /services                 # story fetching for the reader
-    index.js                  # public API — the ONLY thing other features import from
+    index.ts                  # public API — the ONLY thing other features import from
   /story                      # Story / Chapter / Beat CRUD
   /author                     # editor UI + image upload
   /auth                       # NextAuth config, session helpers, role checks
@@ -68,7 +68,7 @@ access together in one folder. `/app` is routing only.
 /lib                          # genuinely global: prisma client, supabase client, utils
 /prisma/schema.prisma
 /docs                         # PLAN.md (spec), PROGRESS.md (session log)
-middleware.js                 # route protection, at project root
+middleware.ts                 # route protection, at project root
 ```
 
 ### Feature-structure rules
@@ -77,7 +77,7 @@ middleware.js                 # route protection, at project root
    component. If a page file grows past ~30 lines, the logic belongs in a feature.
 2. **Features are self-contained.** Components, hooks, and services for one concern live together —
    when working on the reader, everything is in `features/reader`.
-3. **Import across features only through `index.js`.** Never reach into another feature's internals
+3. **Import across features only through `index.ts`.** Never reach into another feature's internals
    (`features/story/components/BeatRow` is off-limits from outside `features/story`).
 4. **Promote on the second use, not the first.** Something needed by two features moves to
    `/components/ui` or `/lib`. Do not pre-emptively put things there "in case".

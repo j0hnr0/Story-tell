@@ -24,7 +24,7 @@ Decisions already made:
 - A PWA is **$0**: Safari → Share → *Add to Home Screen* gives a real icon that launches full-screen
   with no browser chrome. For an experience that is images + text + scrolling, this is
   indistinguishable from native.
-- It reuses the **exact stack already in `../Link-sharing-app`** (Next 15, Tailwind 4, Prisma 7,
+- It reuses the **exact stack already in `../Link-sharing-app`** (Next 16, Tailwind 4, Prisma 7,
   Supabase, NextAuth) — so effort goes into the story engine, not into learning a new ecosystem.
 - Reversible: the reader is a URL, so wrapping it in Capacitor later for a real App Store build
   discards none of this work.
@@ -61,10 +61,12 @@ sized so each ends at a working, committable state rather than mid-refactor.
 
 ## Stack
 
-Mirror `../Link-sharing-app` so conventions carry over: **JavaScript (not TS), `jsconfig.json`,
-App Router, Tailwind v4 via `@tailwindcss/postcss`**.
+Mirror `../Link-sharing-app` so conventions carry over — **App Router, Tailwind v4 via
+`@tailwindcss/postcss`** — with one deliberate departure: this project is **TypeScript**
+(`strict: true`, `tsconfig.json`), not JavaScript, so Prisma's generated model types flow through
+the services.
 
-- **Next.js 15** (App Router) — deployed to Vercel
+- **Next.js 16** (App Router, Turbopack) — deployed to Vercel
 - **Tailwind CSS v4**
 - **Prisma 7** + `@prisma/adapter-pg` → **Supabase Postgres**
 - **Supabase Storage** for illustration files (`@supabase/supabase-js`)
@@ -161,10 +163,10 @@ model Reaction {
 
 ## The reading engine (the heart of the app)
 
-**`app/(reader)/story/[id]/page.jsx`** — server component, fetches story + chapters + beats ordered
+**`app/(reader)/story/[id]/page.tsx`** — server component, fetches story + chapters + beats ordered
 by `index`, passes to the client reader.
 
-**`components/reader/StoryReader.jsx`** — client component. Three stacked layers:
+**`components/reader/StoryReader.tsx`** — client component. Three stacked layers:
 
 ### Layer 1 — fixed image stage (`position: fixed; inset: 0; z-index: 0`)
 
@@ -221,7 +223,7 @@ changes, and rotation, and it costs nothing per frame.
 ### Chapter moments
 
 When `beats[active].chapterId !== beats[prev].chapterId`, render a full-bleed chapter card
-(`ChapterCard.jsx`) — chapter title fading up over a briefly darkened stage, with a longer
+(`ChapterCard.tsx`) — chapter title fading up over a briefly darkened stage, with a longer
 `transitionMs`. This is the "next chapter" moment, given its own visual weight.
 
 ### Read-aloud comfort (this app is *read out loud* — these matter)
@@ -237,13 +239,13 @@ When `beats[active].chapterId !== beats[prev].chapterId`, render a full-bleed ch
 
 ## Authoring (desktop web, `AUTHOR` only)
 
-Gated in `middleware.js` on the NextAuth token's `role`, matching the middleware pattern already in
+Gated in `middleware.ts` on the NextAuth token's `role`, matching the middleware pattern already in
 both sibling projects.
 
-- `app/author/page.jsx` — story list, create / publish / unpublish
-- `app/author/story/[id]/page.jsx` — chapter + beat editor: reorderable beat list, each beat a
+- `app/author/page.tsx` — story list, create / publish / unpublish
+- `app/author/story/[id]/page.tsx` — chapter + beat editor: reorderable beat list, each beat a
   textarea plus an image dropzone
-- `app/api/upload/route.js` — receives the file, uploads to a Supabase Storage bucket, generates the
+- `app/api/upload/route.ts` — receives the file, uploads to a Supabase Storage bucket, generates the
   `blurDataUrl`, returns the public URL
 - A **Preview** button opening the real reader inside a phone-sized frame
 
@@ -273,7 +275,7 @@ Sequenced so the risky, delightful part is proven first.
 
 | Phase | Deliverable |
 | --- | --- |
-| **0** | Scaffold Next 15 + Tailwind 4. **One hardcoded story in a local JSON file + 5 images in `/public`.** Build `StoryReader` and get the scroll-driven cross-fade feeling right. No DB, no auth. |
+| **0** | Scaffold Next 16 + Tailwind 4. **One hardcoded story in a local JSON file + 5 images in `/public`.** Build `StoryReader` and get the scroll-driven cross-fade feeling right. No DB, no auth. |
 | **1** | Prisma + Supabase. Move the story into Postgres; reader loads from DB. Seed script with the Phase 0 story. |
 | **2** | NextAuth (two accounts), `Progress`, PWA manifest + icons + service worker. Installable on her iPhone. |
 | **3** | Author UI + Supabase Storage upload. New stories without touching code. |

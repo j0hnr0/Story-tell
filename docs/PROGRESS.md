@@ -11,14 +11,15 @@ Full spec lives in [PLAN.md](./PLAN.md).
 
 - Repo initialised (`git init`, branch `main`)
 - Project docs created: `CLAUDE.md`, `docs/PLAN.md`, `docs/PROGRESS.md`
+- Scaffolded Next.js 16.3.3 + Tailwind v4 (TypeScript, App Router, no `src/`, `@/*` alias).
+  `npm run build` and `npm run lint` both pass on the default template.
 
 ## Next up
 
-1. Scaffold Next.js 15 + Tailwind CSS v4 (JavaScript, App Router, `jsconfig.json`)
-2. Drop 5 placeholder illustrations into `public/stories/demo/`
-3. Write `lib/demo-story.js` — one hardcoded story, ~5 beats across 2 chapters
-4. Build `components/reader/StoryReader.jsx` — the three-layer scrollytelling engine
-5. Test it **on the actual phone** over the LAN before going any further
+1. Drop 5 placeholder illustrations into `public/stories/demo/`
+2. Write `lib/demo-story.ts` — one hardcoded story, ~5 beats across 2 chapters
+3. Build `components/reader/StoryReader.tsx` — the three-layer scrollytelling engine
+4. Test it **on the actual phone** over the LAN before going any further
 
 ## Decisions made
 
@@ -28,6 +29,13 @@ Full spec lives in [PLAN.md](./PLAN.md).
 - **2026-08-29** — Scroll-driven advance via `IntersectionObserver`, not tap-to-advance and not
   scroll-offset math. Self-corrects for variable text length and font size.
 - **2026-08-29** — Cross-fades in plain CSS transitions; no animation library.
+- **2026-08-30** — **TypeScript**, reversing the original JS decision. Called at scaffold time when
+  the whole codebase was three template files, so the switch was free; later it wouldn't be. Prisma
+  generates model types, and the reader passes beat objects through several hooks and components
+  where a wrong shape should fail at build, not in the middle of a bedtime story.
+- **2026-08-30** — **Next.js 16**, not 15. 16.3.3 is current stable; scaffolding a brand-new
+  project on the previous major only buys a migration later. Turbopack is the default bundler,
+  React 19.2. Docs updated to say 16 throughout.
 - **2026-08-29** — Docs split three ways (`CLAUDE.md` = conventions, `docs/PLAN.md` = spec,
   `docs/PROGRESS.md` = session log) so `CLAUDE.md` stays small and doesn't rot.
 
